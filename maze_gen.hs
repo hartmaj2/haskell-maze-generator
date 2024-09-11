@@ -250,7 +250,6 @@ addEdgeMaybe graph x y prob_mpaths rand =
 
 -- (for test use) doesn't shuffle the array but has the same interface as shuffle
 noShuffle :: [a] -> Random -> ([a],Random)
-noShuffle [] rand = ([],rand)
 noShuffle list inRand = (list,inRand)
 
 
