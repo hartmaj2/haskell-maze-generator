@@ -1,7 +1,5 @@
 --- IMPORTS ---
-import Data.List
 import Debug.Trace
-
 import System.IO
 
 
