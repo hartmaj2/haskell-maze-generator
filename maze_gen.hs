@@ -38,15 +38,16 @@ type SearchState = (Graph,[Node])
 maze :: Int -> Int -> Int -> Int ->  Graph
 maze m n prob_dfs prob_mpaths = addExits $ fst $ fst $ mazeSearch (emptyGraph m n, []) [(startingNode,startingNode)] prob_dfs prob_mpaths random
     where 
-        -- startingNode = toNode (m `div` 2, n `div` 2)
+        -- set starting node to top left corner
         startingNode = toNode (0,0)
+        -- in case I want to start tearing down the walls from middle of maze, use following startingNode: startingNode = toNode (m `div` 2, n `div` 2)
 
 -- checks if a given node is not out of bounds for the given graph
 isValidNode :: Node -> Graph -> Bool
 isValidNode (Node x y) graph = x >= 0 && x <= (m graph - 1) && y >= 0 && y <= (n graph - 1)
 
 -- returns all neighboring valid nodes for the given node in the given graph
--- will be used for bfs and dfs
+-- used for bfs and dfs
 neighbors :: Node -> Graph -> [Node]
 neighbors (Node x y) graph = [Node (x + fst offset) (y + snd offset) | offset <- [(1,0),(-1,0),(0,-1),(0,1)], isValidNode (Node (x + fst offset) (y + snd offset)) graph]
 
