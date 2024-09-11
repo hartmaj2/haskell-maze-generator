@@ -70,7 +70,7 @@ mazeSearch (graph,visited) ((prev,cur):queue) prob_bfs prob_mpaths rand0 =
         then mazeSearch (probAddedGraph,visited) queue prob_bfs prob_mpaths newRand2 
             -- if the current node was visited, we maybe want to add an edge (based on rel_paths)
     else 
-        -- trace (show graph) (mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_dfs prob_mpaths newRand)
+        -- trace (show graph) (mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_bfs prob_mpaths newRand)
         mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_bfs prob_mpaths newRand
             -- if the current node was not visited, we add it to visited and add the corresponding edge from the previous node to the graph always
             -- then we generate lists "left" and "right" that correspond to neighbors that should go at start or end of the queue
