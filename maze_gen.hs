@@ -194,6 +194,8 @@ instance Show Graph where
 
 -- RANDOM NUMBERS 
 
+-- iterate f start -- creates infinite list starting from start and applying the f function to the result over again
+
 -- START borrowed code from Recodex, author: Tomas Dvorak
 
 type Random = [Int] -- typové synonymum
@@ -221,11 +223,11 @@ randomR (dolni, horni) (r : rand) =
 --          list   -> prob_left_list -> start_random -> ((list1, list2), end_random)
 splitRand :: [a] -> Int -> Random -> (([a],[a]),Random)
 splitRand [] prob rand = (([],[]),rand)
-splitRand (x:list) prob_bfs rand = if choice < prob_bfs then ((next1,x:next2),nextRand)
-    else ((x:next1,next2),nextRand)
+splitRand (x:list) prob_bfs inRand = if choice < prob_bfs then ((next1,x:next2),outRand)
+    else ((x:next1,next2),outRand)
     where 
-        (choice,newRand) = randomR (0,100) rand
-        ((next1,next2),nextRand) = splitRand list prob_bfs newRand
+        (choice,rand2) = randomR (0,100) inRand -- get random num between (0,100) and updated random sequence
+        ((next1,next2),outRand) = splitRand list prob_bfs rand2 -- recursively get left list and right list after split using updated random sequence
 
 -- shuffles the given list using the given random sequence and returns the shuffled list and the new random seq
 --       [list] -> init_rand_seq -> (shuffled_list, fin_rand_seq)
@@ -274,3 +276,13 @@ main = do
         relCross = (read relCrossStr :: Int)
         relPaths = (read relPathsStr :: Int)
     print (maze height width relCross relPaths)
+
+
+
+-- SAMPLE METHOD TESTS
+
+-- splitRand
+--  fst $ splitRand [0 .. 9] 50 (drop 0 random)
+
+-- shuffle
+-- fst $ shuffle [0 .. 9] (drop 0 random)
