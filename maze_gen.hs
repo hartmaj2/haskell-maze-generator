@@ -107,15 +107,15 @@ toEdge (n1,n2) =
 emptyGraph :: Int -> Int -> Graph
 emptyGraph m n = Graph { m = m, n = n, edges = [] } 
 
--- adds edge representing the exit from the maze
+-- adds edge representing the exit from the maze (bottom right)
 -- works by just adding a corresponding edge to the graph
 addExitEdge :: Graph -> Graph
 addExitEdge graph = Graph {m = m graph, n = n graph, edges = Edge {node1 = toNode (m graph - 1,n graph - 1), node2 = toNode (m graph ,n graph - 1) } : edges graph }
 
--- adds edge representing entrance to the maze
+-- adds edge representing entrance to the maze (top left)
 -- works by just adding a corresponding edge to the graph
 addEntranceEdge :: Graph -> Graph
-addEntranceEdge graph = Graph {m = m graph, n = n graph, edges = Edge {node1 = toNode (- 1,0), node2 = toNode (0,0) } : edges graph}
+addEntranceEdge graph = Graph {m = m graph, n = n graph, edges = Edge {node1 = toNode (- 1, 0), node2 = toNode (0,0) } : edges graph}
 
 addExits :: Graph -> Graph 
 addExits = addExitEdge . addEntranceEdge
