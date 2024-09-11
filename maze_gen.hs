@@ -233,11 +233,11 @@ splitRand (x:list) prob_bfs inRand = if choice < prob_bfs then ((next1,x:next2),
 --       [list] -> init_rand_seq -> (shuffled_list, fin_rand_seq)
 shuffle :: [a] -> Random -> ([a],Random)
 shuffle [] rand = ([],rand)
-shuffle list inRand = (x:nextList,nextRand)
+shuffle list inRand = (x:nextList,outRand)  -- x is the picked element to add to start
     where
-        (randN,newRand) = randomR (0,length list - 1) inRand  
-        (left,x:right) = splitAt randN list
-        (nextList,nextRand) = shuffle (left ++ right) newRand
+        (randPos,rand2) = randomR (0,length list - 1) inRand  
+        (left,x:right) = splitAt randPos list   -- pick the x element (x is the first element of right list after random split)
+        (nextList,outRand) = shuffle (left ++ right) rand2
 
 -- adds edge to the graph only sometimes, the probability in percent is given as fourth parameter
 --              graph -> node1 -> node2 -> prob_add_edge -> random_seq -> (new_graph,new_random_seq)
