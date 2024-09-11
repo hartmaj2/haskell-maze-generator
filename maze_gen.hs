@@ -74,9 +74,13 @@ mazeSearch (graph,visited) ((prev,cur):queue) prob_bfs prob_mpaths inRand =
     else 
         -- trace (show graph) (mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_bfs prob_mpaths newRand)
         mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_bfs prob_mpaths elseOutRand
-            -- if the current node was not visited, we add it to visited and add the corresponding edge from the previous node to the graph always
-            -- then we generate lists "left" and "right" that correspond to neighbors that should go at start or end of the queue
-            -- before we preform the split of the neighbors we need to shuffle them to add randomness into which neighbor we pick next 
+            -- if the current node was not visited, we do: 
+            --  1. add current node to visited 
+            --  2. add edge from the previous node to current node to the graph
+            --  4. shuffle the neighbors of the current node (especially needed when always putting neighbors to just left or right)
+            --  3. we generate lists "left" and "right" that correspond to neighbors that should go at start or end of the queue
+            --      (the neighbors in left list get chosen before the neighbors in the right list)
+            
     where 
         -- then clause
         (probAddedGraph,thenOutRand) = addEdgeMaybe graph prev cur prob_mpaths inRand
