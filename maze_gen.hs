@@ -117,6 +117,7 @@ addExitEdge graph = Graph {m = m graph, n = n graph, edges = Edge {node1 = toNod
 addEntranceEdge :: Graph -> Graph
 addEntranceEdge graph = Graph {m = m graph, n = n graph, edges = Edge {node1 = toNode (- 1, 0), node2 = toNode (0,0) } : edges graph}
 
+-- adds both the exit and the entrance by using function composition
 addExits :: Graph -> Graph 
 addExits = addExitEdge . addEntranceEdge
 
@@ -136,25 +137,28 @@ blank :: String
 blank = "  "
 
 
--- !THE INDICES OF THE INNER GRAPH REPRESENTATION ARE DIFFERENT THAN THE TEXT REPRESENTATION OF THE MAZE!
+-- !THE INDICES OF THE ALGORITHM/INNER GRAPH REPRESENTATION ARE DIFFERENT THAN THE TEXT REPRESENTATION OF THE MAZE!
 -- graph representation has n rows => text representation has 2n + 1 rows
 
--- returns string representation for single row of the graph represented by its list of edges
+-- returns text representation for single algorithm/inner graph row (so returns two rows of text)
 -- a single row in this context means all the vertices in row i and their corresponding edges
 -- but also the edges between vertices at rows i and i + 1
 --        graph  -> graph_repr_index -> two_corresponding_rows_of_text_repr
 showRow :: Graph -> Int -> String
 showRow graph i =
-    wall ++ concat [showPosRight graph i y | y <- [0.. (n graph - 1)]] -- odd row of text representation
+    wall ++ concat [showPosRight graph i y | y <- [0 .. (n graph - 1)]] -- odd row of text representation
     ++ "\n" ++
-    wall ++ concat [showPosDown graph i y | y <- [0.. (n graph - 1)]] -- even row of text representation
+    wall ++ concat [showPosDown graph i y | y <- [0 .. (n graph - 1)]] -- even row of text representation
     ++ "\n"
 
 
--- showPosRight is used to print rows with odd indices (starting with top wall with index 0)
+-- showPosRight is used to print rows with odd indices (text maze representation, starting with top wall with index 0)
 
--- given x,y positions of a node prints a blank for this node (nodes are always represented by blank) and a wall if there is no edge going right
--- or prints a blank between nodes (x,y) and (x,y+1) if there is an edge
+-- given x,y positions of a node prints:
+-- 1. a blank for this node (nodes are always represented by blank) 
+-- 2.
+--  a) wall if there is no edge going right
+--  b) blank between nodes (x,y) and (x,y+1) if there is an edge
 showPosRight :: Graph -> Int -> Int -> String
 showPosRight graph x y =
     if toEdge ((x,y),(x,y+1)) `elem` edges graph
@@ -163,18 +167,23 @@ showPosRight graph x y =
 
 -- showPosDown is used to print rows with even indices (starting with top wall with index 0) (rows with even indices have at even columns cells, that are always walls)
 
--- given x,y positions prints the edge between (x,y) and (x+1,y) and if there is one
--- then prints a wall symbol
+-- given x,y positions prints:
+-- 1. 
+--  a) edge between (x,y) and (x+1,y) and if there is one
+--  b) wall if no edge
+-- 2. a wall symbol
 showPosDown :: Graph -> Int -> Int -> String
 showPosDown graph x y =
     if toEdge ((x,y),(x+1,y)) `elem` edges graph
         then blank ++ wall -- there is edge (path)
     else wall ++ wall
 
--- concatenates strings for all rows of graph representation (that means we concatenate pairs of rows) and then drops the first row until newline
+-- concatenates strings for all rows of graph representation (that means we concatenate pairs of rows) and then drops the first row (drops until newline)
+-- the first row of inner graph representation is -1 which is used for displaying maze entrance, we won't only the second part of its text representation => we drop first row
 showGraph :: Graph -> String
 showGraph graph = dropWhile (/= '\n') $ concat $ [showRow graph i | i <- [-1..(m graph - 1)]]
 
+-- make graph data type implement my custom show
 instance Show Graph where
     show = showGraph
 
