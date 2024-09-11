@@ -1,0 +1,21 @@
+# Compiled source #
+*.o
+*.hi
+
+# GHCi
+.ghci_history
+.ghc.environment.*
+
+# Stack
+.stack-work/
+
+# Cabal
+dist/
+dist-*/
+
+# Hoogle
+.hoogle/
+
+# Static analysis
+.hsenv
+.cabal-sandbox/
