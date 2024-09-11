@@ -62,23 +62,27 @@ addEdge graph x y = Graph {m = m graph, n = n graph, edges = (Edge { node1 = x, 
 -- prob_mpaths parameter is the probability, that after seeing an already visited node, we will create a new path by tearing down the wall between the prev cell and current cell
 -- rel_crossings prob parameter just determines, the ratio between putting neighbor nodes at start or end of queue (the ratio between acting like a dfs or bfs)
 
---     (init_graph,init_visited) -> [(previous_node,new_node_on_queue)] -> rel_crossings -> rel_paths -> random -> ((new_graph, new_visited),random)
+-- edges_to_search_queue has the format: [(old_node_from_queue,new_node_from_queue)]
+
+--     (init_graph,init_visited) -> edges_to_search_queue -> rel_crossings -> rel_paths -> random -> ((new_graph, new_visited),random)
 mazeSearch :: SearchState -> [(Node,Node)] -> Int ->  Int -> Random -> (SearchState,Random)
 mazeSearch ss [] prob_dfs prob_mpaths rand = (ss,rand)
-mazeSearch (graph,visited) ((prev,cur):queue) prob_bfs prob_mpaths rand0 = 
+mazeSearch (graph,visited) ((prev,cur):queue) prob_bfs prob_mpaths inRand = 
     if cur `elem` visited 
-        then mazeSearch (probAddedGraph,visited) queue prob_bfs prob_mpaths newRand2 
+        then mazeSearch (probAddedGraph,visited) queue prob_bfs prob_mpaths thenOutRand 
             -- if the current node was visited, we maybe want to add an edge (based on rel_paths)
     else 
         -- trace (show graph) (mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_bfs prob_mpaths newRand)
-        mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_bfs prob_mpaths newRand
+        mazeSearch (addEdge graph prev cur,cur:visited) ([(cur,next) | next <- left] ++ queue ++ [(cur,next) | next <- right] ) prob_bfs prob_mpaths elseOutRand
             -- if the current node was not visited, we add it to visited and add the corresponding edge from the previous node to the graph always
             -- then we generate lists "left" and "right" that correspond to neighbors that should go at start or end of the queue
             -- before we preform the split of the neighbors we need to shuffle them to add randomness into which neighbor we pick next 
     where 
-        (shuffledNeighbors,rand1) = shuffle (neighbors cur graph) rand0
-        ((left,right),newRand) = splitRand shuffledNeighbors prob_bfs rand1
-        (probAddedGraph,newRand2) = addEdgeMaybe graph prev cur prob_mpaths rand0
+        -- then clause
+        (probAddedGraph,thenOutRand) = addEdgeMaybe graph prev cur prob_mpaths inRand
+        -- else clause
+        (shuffledNeighbors,elseRand2) = shuffle (neighbors cur graph) inRand
+        ((left,right),elseOutRand) = splitRand shuffledNeighbors prob_bfs elseRand2
 
 
 
@@ -221,14 +225,14 @@ randomR (dolni, horni) (r : rand) =
 
 -- splits the given list in two random groups based on given probability
 -- prob is the percent probability that any element will end up in left list
---          list   -> prob_left_list -> start_random -> ((list1, list2), end_random)
+--          list   -> prob_right_list -> start_random -> ((list1, list2), end_random)
 splitRand :: [a] -> Int -> Random -> (([a],[a]),Random)
 splitRand [] prob rand = (([],[]),rand)
-splitRand (x:list) prob_bfs inRand = if choice < prob_bfs then ((next1,x:next2),outRand)
+splitRand (x:list) prob_right_list inRand = if choice <= prob_right_list then ((next1,x:next2),outRand)
     else ((x:next1,next2),outRand)
     where 
         (choice,rand2) = randomR (0,100) inRand -- get random num between (0,100) and updated random sequence
-        ((next1,next2),outRand) = splitRand list prob_bfs rand2 -- recursively get left list and right list after split using updated random sequence
+        ((next1,next2),outRand) = splitRand list prob_right_list rand2 -- recursively get left list and right list after split using updated random sequence
 
 -- shuffles the given list using the given random sequence and returns the shuffled list and the new random seq
 --       [list] -> init_rand_seq -> (shuffled_list, fin_rand_seq)
@@ -286,3 +290,6 @@ main = do
 
 -- shuffle
 -- fst $ shuffle [0 .. 9] (drop 0 random)
+
+-- following was used to find bug in splitRand when having prob_right to 100
+-- take 100 ( iterate ( \ x -> trace (show $ fst $ splitRand [0 .. 9] 100 (drop x random)) (x+100) ) 0 )
