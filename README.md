@@ -50,7 +50,7 @@ Program jsem rozdělil na 7 následujících částí:
 
 Níže popíši jednotlivé části blíže.
 
-### Imports
+### IMPORTS
 Tato část obsahuje příkazy pro přidání knihoven, které v programu používám. Knihovna `Debug.Trace` není použita přímo, ale ve funkci `mazeSearch` mám schovaný komentář, který při odkomentování umožňuje postupně tisknout jednotlivé kroky, během kterých se generuje bludiště. Knihovna `System.IO` zase slouží k čtení vstupu od uživatele.
 
 ### DATA STRUCTURES AND TYPE SYNONYMS
